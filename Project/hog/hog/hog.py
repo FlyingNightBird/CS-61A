@@ -135,7 +135,7 @@ def play(strategy0, strategy1, score0=0, score1=0, dice=six_sided,
             score0=score0+take_turn(strategy0(score0,score1),score1,dice);
         elif player==1:
             score1=score1+take_turn(strategy1(score1,score0),score0,dice);
-        if is_swap():
+        if is_swap(score0,score1):
             cur=score0;
             score0=score1;
             score1=cur;
@@ -228,6 +228,19 @@ def announce_highest(who, previous_high=0, previous_score=0):
     assert who == 0 or who == 1, 'The who argument should indicate a player.'
     # BEGIN PROBLEM 7
     "*** YOUR CODE HERE ***"
+    def saygain(score0, score1):
+        nonlocal previous_high, previous_score;
+        if who == 0:
+            curr = score0 - previous_score;
+            previous_score = score0;
+        elif who == 1:
+            curr = score1 - previous_score;
+            previous_score = score1;
+        if curr > previous_high:
+            print(curr, "point(s)! That's the biggest gain yet for", who);
+            previous_high = curr;
+        return announce_highest(who, previous_high, previous_score);
+    return saygain;
     # END PROBLEM 7
 
 
