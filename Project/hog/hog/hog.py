@@ -280,6 +280,13 @@ def make_averaged(fn, num_samples=1000):
     """
     # BEGIN PROBLEM 8
     "*** YOUR CODE HERE ***"
+    def average(*args):
+        i,total=0,0;
+        while i<num_samples:
+            i,total=i+1,total+fn(args);
+        return total/i;
+    return average;
+
     # END PROBLEM 8
 
 
@@ -294,6 +301,15 @@ def max_scoring_num_rolls(dice=six_sided, num_samples=1000):
     """
     # BEGIN PROBLEM 9
     "*** YOUR CODE HERE ***"
+    i, max_score = 1, 0
+    while i <= 10:
+        averaged_roll_dice = make_averaged(roll_dice, num_samples)
+        max_score_i = averaged_roll_dice(i, dice)
+        if max_score_i > max_score:
+            max_score = max_score_i
+            max_score_num = i
+        i += 1
+    return max_score_num
     # END PROBLEM 9
 
 
@@ -342,7 +358,10 @@ def bacon_strategy(score, opponent_score, margin=8, num_rolls=4):
     rolls NUM_ROLLS otherwise.
     """
     # BEGIN PROBLEM 10
-    return 4  # Replace this statement
+    if free_bacon(opponent_score) >= margin:
+        return 0
+    else:
+        return num_rolls
     # END PROBLEM 10
 
 
@@ -352,7 +371,13 @@ def swap_strategy(score, opponent_score, margin=8, num_rolls=4):
     non-beneficial swap. Otherwise, it rolls NUM_ROLLS.
     """
     # BEGIN PROBLEM 11
-    return 4  # Replace this statement
+    score = free_bacon(opponent_score) + score
+    if score < opponent_score and is_swap(score, opponent_score):
+        return 0
+    elif free_bacon(opponent_score) >= margin:
+        return 0
+    else:
+        return num_rolls
     # END PROBLEM 11
 
 
@@ -362,8 +387,48 @@ def final_strategy(score, opponent_score):
     *** YOUR DESCRIPTION HERE ***
     """
     # BEGIN PROBLEM 12
-    return 4  # Replace this statement
-    # END PROBLEM 12
+    score_after_bacon = score + free_bacon(opponent_score)
+    if score < 10:  # Start with the swap_strategy
+        return swap_strategy(score, opponent_score)
+    elif score_after_bacon >= 100:  # win by rolling 0
+        return 0
+    elif score >= 90:
+        return 2
+    elif score < opponent_score:
+        if is_swap(score_after_bacon, opponent_score):  # Beneficial swap after bacon
+            if opponent_score - score > 10:
+                return 0
+            else:
+                n = 0
+                while (score + n) < opponent_score // 2:
+                    if opponent_score % (score + n) == 0:
+                        if 1 <= n <= 6:
+                            return 1
+                        elif 7 <= n <= 8:
+                            return 2
+                        elif 9 <= n <= 12:
+                            return 3
+                        else:
+                            return 4
+                    n += 1
+                else:
+                    return 4
+        elif opponent_score >= 90 and opponent_score - score > 50:
+            return 10
+        else:
+            return 4
+    elif score > opponent_score:
+        if score - opponent_score > 40:
+            return 3
+        elif is_swap(score_after_bacon, opponent_score):  # disadvantageous swap after bacon
+            return 4
+        else:
+            return 4
+    else:
+        return 4
+
+
+# END PROBLEM 12
 
 
 ##########################
